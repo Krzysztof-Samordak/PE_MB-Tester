@@ -1,0 +1,9 @@
+C:\Users\Krzysztof Samordak\source\repos\Keysight.KtEL30000_connect\build\Release\x64\KtEL30000_Cs_Example1.exe.config
+C:\Users\Krzysztof Samordak\source\repos\Keysight.KtEL30000_connect\build\Release\x64\KtEL30000_Cs_Example1.exe
+C:\Users\Krzysztof Samordak\source\repos\Keysight.KtEL30000_connect\build\Release\x64\KtEL30000_Cs_Example1.pdb
+C:\Users\Krzysztof Samordak\source\repos\Keysight.KtEL30000_connect\obj\x64\Release\KtEL30000_Cs_Example1.csproj.AssemblyReference.cache
+C:\Users\Krzysztof Samordak\source\repos\Keysight.KtEL30000_connect\obj\x64\Release\KtEL30000_Cs_Example1.csproj.SuggestedBindingRedirects.cache
+C:\Users\Krzysztof Samordak\source\repos\Keysight.KtEL30000_connect\obj\x64\Release\KtEL30000_Cs_Example1.exe.config
+C:\Users\Krzysztof Samordak\source\repos\Keysight.KtEL30000_connect\obj\x64\Release\KtEL30000_Cs_Example1.csproj.CoreCompileInputs.cache
+C:\Users\Krzysztof Samordak\source\repos\Keysight.KtEL30000_connect\obj\x64\Release\KtEL30000_Cs_Example1.exe
+C:\Users\Krzysztof Samordak\source\repos\Keysight.KtEL30000_connect\obj\x64\Release\KtEL30000_Cs_Example1.pdb
