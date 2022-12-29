@@ -1,0 +1,2 @@
+# PE_MB-Tester
+The PE_MB Tester is a Windows desktop application for testing of USB hub controller and power limiter located on PCBA. The application needs the test hardware and Keysight DC Electronic Load.  The program at first step detect the USB hub controller located on PCBA and components connected to it: – on PCBA - network adapter and sound controller  placed in tester’s hardware - the USB flash disk. The second step is to run control DC Electronic Load and perform load test to verify power limiter  functionality.
