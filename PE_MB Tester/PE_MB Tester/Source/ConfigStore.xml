@@ -1,0 +1,68 @@
+<IviConfigStore xmlns:dt="urn:schemas-microsoft-com:datatypes">
+	<Name>IVI Configuration Server</Name>
+	<Description>The IVI Configuration Server allows access to and modification of an IVI configuration store</Description>
+	<Vendor>IVI Foundation, Inc</Vendor>
+	<Revision>1.3.1.0</Revision>
+	<SpecificationMajorVersion>1</SpecificationMajorVersion>
+	<SpecificationMinorVersion>0</SpecificationMinorVersion>
+	<MasterLocation></MasterLocation>
+	<ProcessDefaultLocation/>
+	<ActualLocation></ActualLocation>
+	<PublishedAPIs>
+		<IviPublishedAPI id="p4">
+			<Name>IviDriver</Name>
+			<MajorVersion>1</MajorVersion>
+			<MinorVersion>0</MinorVersion>
+			<Type>IVI.NET</Type>
+		</IviPublishedAPI>
+	</PublishedAPIs>
+	<SoftwareModules>
+		<IviSoftwareModule id="p1">
+			<Name>Keysight.KtEL30000 v1.1.0 Fx45</Name>
+			<Description>IVI.NET Driver for KtEL30000</Description>
+			<DataComponents>
+				<IviStructure id="p2">
+					<Name>Configurable Initial Settings</Name>
+					<Description/>
+					<ReadOnly>1</ReadOnly>
+					<UsedInSession>Required</UsedInSession>
+					<Type>Structure</Type>
+					<HelpContextID>0</HelpContextID>
+					<HelpFilePath/>
+					<SoftwareModuleKey/>
+					<DataComponents>
+						<IviString id="p3">
+							<Name>Model</Name>
+							<Description>Default model used during simulation</Description>
+							<ReadOnly>1</ReadOnly>
+							<UsedInSession>Required</UsedInSession>
+							<Type>String</Type>
+							<HelpContextID>0</HelpContextID>
+							<HelpFilePath/>
+							<SoftwareModuleKey/>
+							<Value>EL34243A</Value>
+						</IviString>
+					</DataComponents>
+				</IviStructure>
+			</DataComponents>
+			<ModulePath></ModulePath>
+			<Prefix></Prefix>
+			<ProgID></ProgID>
+			<SupportedInstrumentModels>EL34243A,EL34143A,EL33133A</SupportedInstrumentModels>
+			<PhysicalNames>
+			</PhysicalNames>
+			<PublishedAPIs>
+				<IviPublishedAPI idref="p4"/>
+			</PublishedAPIs>
+			<AssemblyQualifiedClassName>Keysight.KtEL30000.KtEL30000, Keysight.KtEL30000.Fx45, Version=1.1.0.0, Culture=neutral, PublicKeyToken=7e3f5d0cd5f27736</AssemblyQualifiedClassName>
+			<ModulePath64></ModulePath64>
+		</IviSoftwareModule>
+	</SoftwareModules>
+	<HardwareAssets>
+	</HardwareAssets>
+	<DriverSessions>
+	</DriverSessions>
+	<Sessions/>
+	<LogicalNames>
+	</LogicalNames>
+</IviConfigStore>
