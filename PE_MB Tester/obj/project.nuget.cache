@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "ZD8DnXch7Df3RCioifAupPUjRTomS0HmTY1eXexgEMNSdWhqQn8/IjTNkFN6bqKGlcxT49hLU1iZTO04U1o0NA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Krzysztof Samordak\\source\\repos\\PE_MB Tester\\PE_MB Tester\\PE_MB Tester.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Krzysztof Samordak\\.nuget\\packages\\ftd2xx.net\\1.2.1\\ftd2xx.net.1.2.1.nupkg.sha512",
+    "C:\\Users\\Krzysztof Samordak\\.nuget\\packages\\system.codedom\\7.0.0\\system.codedom.7.0.0.nupkg.sha512",
+    "C:\\Users\\Krzysztof Samordak\\.nuget\\packages\\system.management\\7.0.0\\system.management.7.0.0.nupkg.sha512",
+    "C:\\Users\\Krzysztof Samordak\\.nuget\\packages\\threeshape.msbuild.codecheck\\7.0.0\\threeshape.msbuild.codecheck.7.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
