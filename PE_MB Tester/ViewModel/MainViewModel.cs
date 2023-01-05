@@ -18,6 +18,7 @@ using System.Windows.Input;
 using PE_MB_Tester.Commands;
 using PE_MB_Tester.USBDevices;
 using PE_MB_Tester.ELs;
+using PE_MB_Tester.Tests;
 
 namespace PE_MB_Tester.MainViewModel
 {
@@ -38,7 +39,7 @@ namespace PE_MB_Tester.MainViewModel
         const int time = 10;
         DispatcherTimer dispatcherTimer = new DispatcherTimer();
 
-        //View variables setup
+        //Auxiliary variables
         const string en = "True";
         const string dis = "False";
         const string ready = "Open, close for auto start";
@@ -47,15 +48,24 @@ namespace PE_MB_Tester.MainViewModel
         const string pass = "PASS";
         const string fail = "FAIL";
         const string clear = "clear";
-        private string _ElStatus = "Disconnected";
+
+        //View variables setup
+        private string _elStatus = "Disconnected";
         private string _startStopButton = en;
         private string _testerStatus;
         private string _testerStatusColor;
         private string _testResult;
         private string _testResultColor;
-        private string _ElStatusColor = "Red";
-        public ICommand StartStopTestCommand { get; set; }
-        public string TesterStatusColor
+        private string _elStatusColor = "Red";
+        private string _usbTestResult;
+        private string _powerLimiterTestResult;
+
+        //Create tests list
+        List<Test> tests = new List<Test>();
+
+        public ICommand startStopTestCommand { get; set; }
+
+        public string testerStatusColor
         {
             get { return _testerStatusColor; }
             set
@@ -80,42 +90,42 @@ namespace PE_MB_Tester.MainViewModel
                 }
             }
         }
-        public string TesterStatus
+        public string testerStatus
         {
             get { return _testerStatus; }
             set
             {
                 if(value == ready)
                 {
-                    TesterStatusColor = "Orange";
+                    testerStatusColor = "Orange";
                     _testerStatus = value;
                     OnPropertyChanged();
                 }else if (value == testInprogress)
                 {
-                    TesterStatusColor = "Red";
+                    testerStatusColor = "Red";
                     _testerStatus = value;
                     OnPropertyChanged();
                 }else if (value == testFinished)
                 {
-                    TesterStatusColor = "Green";
+                    testerStatusColor = "Green";
                     _testerStatus = value;
                     OnPropertyChanged();
                 }
             }
         }
-        public string TestResult
+        public string testResult
         {
             get { return _testResult; }
             set
             {
                 if (value == pass)
                 {
-                    TestResultColor = "Green";
+                    testResultColor = "Green";
                     _testResult = value;
                     OnPropertyChanged();
                 }else if(value == fail)
                 {
-                    TestResultColor = "Red";
+                    testResultColor = "Red";
                     _testResult = value;
                     OnPropertyChanged();
                 }
@@ -126,7 +136,51 @@ namespace PE_MB_Tester.MainViewModel
                 }
             }
         }
-        public string TestResultColor
+        public string usbTestResult
+        {
+            get { return _usbTestResult; }
+            set
+            {
+                if (value == pass)
+                {
+                    _usbTestResult = value;
+                    OnPropertyChanged();
+                }
+                else if (value == fail)
+                {
+                    _usbTestResult = value;
+                    OnPropertyChanged();
+                }
+                else if (value == clear)
+                {
+                    _usbTestResult = "";
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public string powerLimiterTestResult
+        {
+            get { return _powerLimiterTestResult; }
+            set
+            {
+                if (value == pass)
+                {
+                    _powerLimiterTestResult = value;
+                    OnPropertyChanged();
+                }
+                else if (value == fail)
+                {
+                    _powerLimiterTestResult = value;
+                    OnPropertyChanged();
+                }
+                else if (value == clear)
+                {
+                    _powerLimiterTestResult = "";
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public string testResultColor
         {
             get { return _testResultColor; }
             set
@@ -139,34 +193,41 @@ namespace PE_MB_Tester.MainViewModel
                 }
             }
         }
-        public string ElStatus
+        public string elStatus
         {
-            get { return _ElStatus; }
+            get { return _elStatus; }
             set
             {
 
-                    _ElStatus = value;
+                    _elStatus = value;
                     OnPropertyChanged();
             }
         }
-        public string ElStatusColor
+        public string elStatusColor
         {
-            get { return _ElStatusColor; }
+            get { return _elStatusColor; }
             set
             {
                 Color c = Color.FromName(value);
                 if (c.IsKnownColor)
                 {
-                    _ElStatusColor = value;
+                    _elStatusColor = value;
                     OnPropertyChanged();
                 }
             }
         }
+
+
         public MainViewModel()
         {
             ReadConfig();
 
-            StartStopTestCommand = new RelayCommand(StartStopTestClick);
+            startStopTestCommand = new RelayCommand(StartStopTestClick);
+
+            //Create tests list
+            tests.Add(new Test() { id = 0, name = "USB Controller Test", value = "", result = "" });
+            tests.Add(new Test() { id = 1, name = "Power Limiter Test", value = "", result = "" });
+
             /*            logger.logMultiple(_relayController.FindDevices(), "Found FTDI devices: ");
                         logger.log("Required FTDI device is connected: " + (_relayController.Connect()).ToString());
                         logger.log("Bit_bang Mode on: " + (_relayController.SetBitBangMode()).ToString());
@@ -176,7 +237,7 @@ namespace PE_MB_Tester.MainViewModel
              */
 
             //setup Timer
-            dispatcherTimer.Tick += dispatcherTimer_Tick;
+            dispatcherTimer.Tick += DispatcherTimerTick;
             dispatcherTimer.Interval = new TimeSpan(0, 0, time);
 
             //check for required devices
@@ -186,7 +247,7 @@ namespace PE_MB_Tester.MainViewModel
             StartEventWatcher();
 
             //set the Test Setup to ready
-            TesterStatus = ready;
+            testerStatus = ready;
             logger.log(ready);
             logger.log(KtEL34143a._measuredValueMaxLimit.ToString());
         }
@@ -280,6 +341,7 @@ namespace PE_MB_Tester.MainViewModel
             string vidPid = "";
             string name = "";
             string status = "";
+
             ManagementBaseObject instance = (ManagementBaseObject)e.NewEvent["TargetInstance"];
             vidPid = (string)instance.GetPropertyValue("PNPDeviceID");
             name = (string)instance.GetPropertyValue("Name");
@@ -295,6 +357,7 @@ namespace PE_MB_Tester.MainViewModel
         {
             string vidPid;
             string name;
+
             ManagementBaseObject instance = (ManagementBaseObject)e.NewEvent["TargetInstance"];
             vidPid = (string)instance.GetPropertyValue("PNPDeviceID");
             name = (string)instance.GetPropertyValue("Name");
@@ -302,12 +365,14 @@ namespace PE_MB_Tester.MainViewModel
             RemoveChekAllIds(vidPid, name);
         }
 
-        void InsertChekAllIds(string Vid_Pid, string Name)
+        bool InsertChekAllIds(string Vid_Pid, string Name)
         {
+            bool returnValue = false;
             if (flashDisk.InsertCheck(Vid_Pid, Name))
             {
                 CheckTestStatus();
                 logger.log("FlashDisk detected");
+                returnValue = true;
                 if (penDrive.checkIfInserted() && hubController.checkIfInserted())
                 {
                 }
@@ -316,6 +381,7 @@ namespace PE_MB_Tester.MainViewModel
             {
                 CheckTestStatus();
                 logger.log("PenDrive detected");
+                returnValue = true;
                 if (flashDisk.checkIfInserted() && hubController.checkIfInserted())
                 {
                 }
@@ -324,6 +390,7 @@ namespace PE_MB_Tester.MainViewModel
             {
                 CheckTestStatus();
                 logger.log("HubController detected");
+                returnValue = true;
                 if (penDrive.checkIfInserted() && flashDisk.checkIfInserted())
                 {
 
@@ -333,6 +400,7 @@ namespace PE_MB_Tester.MainViewModel
             {
                 CheckTestStatus();
                 logger.log("AudioController detected");
+                returnValue = true;
                 if (usbCompositeDevice.checkIfInserted())
                 {
                 }
@@ -341,11 +409,13 @@ namespace PE_MB_Tester.MainViewModel
             {
                 CheckTestStatus();
                 logger.log("NetworkAdapter detected");
+                returnValue = true;
             }
             else if (usbCompositeDevice.InsertCheckIdAndName(Vid_Pid, Name))
             {
                 CheckTestStatus();
                 logger.log("UsbCompositeDevice detected");
+                returnValue = true;
                 if (audioController.checkIfInserted())
                 {
 
@@ -354,9 +424,11 @@ namespace PE_MB_Tester.MainViewModel
             if (penDrive.checkIfInserted() && flashDisk.checkIfInserted() && hubController.checkIfInserted() &&
                 usbCompositeDevice.checkIfInserted() && audioController.checkIfInserted() && networkAdapter.checkIfInserted())
             {
-                logger.log("PASS THE TEST");
                 UsbTestPass();
+                // Perform limiter test
+                FinishTest();
             }
+            return returnValue;
         }
 
         void RemoveChekAllIds(string Vid_Pid, string Name)
@@ -383,38 +455,42 @@ namespace PE_MB_Tester.MainViewModel
                 !usbCompositeDevice.checkIfInserted() && !audioController.checkIfInserted() && !networkAdapter.checkIfInserted())
             {
                 TimerStop();
-                TesterStatus = ready;
+                testerStatus = ready;
                 logger.log(ready);
             }
         }
+
         void CheckTestStatus()
         {
-            if (TesterStatus != testInprogress)
+            if (testerStatus != testInprogress)
             {
                 StartTest();
             }
         }
+
         public void StartTest()
         {
-            TesterStatus = testInprogress;
-            TestResult = clear;
-            dispatcherTimer.Start();
+            startStopButton = dis;
+            testerStatus = testInprogress;
+            testResult = clear;
+            TimerStart(time);
             logger.log("Running test sequence.");
         }
 
         public void ManualStartTest()
         {
-            TesterStatus = testInprogress;
-            TestResult = clear;
+            startStopButton = dis;
+            testerStatus = testInprogress;
+            testResult = clear;
             logger.log("Test sequence started manually.");
         }
 
-        public void StopTest()
+        public void FinishTest()
         {
-            TimerStop();
+            startStopButton = en;
         }
 
-        public void TimerStart()
+        public void TimerStart(int time)
         {
             dispatcherTimer.Interval = new TimeSpan(0, 0, time);
             dispatcherTimer.Start();
@@ -430,60 +506,70 @@ namespace PE_MB_Tester.MainViewModel
             }
         }
 
-        private void dispatcherTimer_Tick(object sender, EventArgs e)
+        private void DispatcherTimerTick(object sender, EventArgs e)
         {
             TimerStop();
             UsbTestFail();
+            // Perform limiter test
+            FinishTest();
         }
 
         public void UsbTestFail()
         {
-            TestResult = fail;
-            TesterStatus = testFinished;
+            usbTestResult = fail;
+            logger.log("USB Test FAIL!");// Zmien na USB test Result fail
+            //testerStatus = testFinished;          Zmien na USB Test Finished
         }
         public void UsbTestPass()
         {
             TimerStop();
-            TestResult = pass;
-            TesterStatus = testFinished;
+            logger.log("USB Test PASS!");
+            usbTestResult = pass;                      // Zmien na USB test Result pass
+//            testerStatus = testFinished;          Zmien na USB Test Finished
         }
+
         private void StartStopTestClick(object obj)
         {
             ThreadPool.QueueUserWorkItem(new WaitCallback(StartStopTest));
         }
+
         private void StartStopTest(object obj)
         {
             string vidPid = "";
             string name = "";
             string status = "";
+            double result;
 
-            startStopButton = dis;
-            logger.log("tester status: " + TesterStatus);
             ManualStartTest();
-            logger.log("tester status: " + TesterStatus);
             foreach (ManagementObject device in new ManagementObjectSearcher(String.Format(@"SELECT * FROM Win32_PNPEntity")).Get())
             {
                 vidPid = (string)device.GetPropertyValue("PNPDeviceID");
                 name = (string)device.GetPropertyValue("Name");
                 status = (string)device.GetPropertyValue("Status");
-                logger.log(vidPid);
-                logger.log(name);
                 if (status == "OK")
                 {
-                    InsertChekAllIds(vidPid, name);
+                    if(InsertChekAllIds(vidPid, name))
+                    {
+                        logger.log(vidPid);
+                        logger.log(name);
+                    }
                 }
             }
-            if (TestResult != pass)
+            if (testResult != pass)
             {
                 //UsbTestFail();
             }
-            if(checkRequiredDevices())
+            if (checkRequiredDevices())
             {
                 logger.logMultiple(KtEL34143a.test());
-                UsbTestPass();
+                if (KtEL34143a.getTestResult())
+                {
+                    // TEST PASS
+                }
             }
             startStopButton = en;
         }
+
         bool checkRequiredDevices()
         {
             bool returnValue = false;
@@ -492,13 +578,13 @@ namespace PE_MB_Tester.MainViewModel
             if (!KtEL34143a.isConnected())
             {
                 MessageBox.Show("Cannot find the Electronic load device!");
-                ElStatusColor = "Red";
-                ElStatus = "Disconnected";
+                elStatusColor = "Red";
+                elStatus = "Disconnected";
             }
             else
             {
-                ElStatusColor = "Green";
-                ElStatus = "Connected";
+                elStatusColor = "Green";
+                elStatus = "Connected";
                 returnValue = true;
             }
             return returnValue;

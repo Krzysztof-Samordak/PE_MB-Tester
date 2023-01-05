@@ -160,11 +160,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Krzysztof Samordak\\source\\repos\\PE_MB Tester\\PE_MB Tester\\PE_MB Tester.csproj",
+      "projectUniqueName": "C:\\Users\\Krzysztof Samordak\\OneDrive - 3Shape A S\\Documents\\Programs and scripts\\C#\\PE_MB_Tester\\PE_MB Tester\\PE_MB Tester.csproj",
       "projectName": "PE_MB Tester",
-      "projectPath": "C:\\Users\\Krzysztof Samordak\\source\\repos\\PE_MB Tester\\PE_MB Tester\\PE_MB Tester.csproj",
+      "projectPath": "C:\\Users\\Krzysztof Samordak\\OneDrive - 3Shape A S\\Documents\\Programs and scripts\\C#\\PE_MB_Tester\\PE_MB Tester\\PE_MB Tester.csproj",
       "packagesPath": "C:\\Users\\Krzysztof Samordak\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Krzysztof Samordak\\source\\repos\\PE_MB Tester\\PE_MB Tester\\obj\\",
+      "outputPath": "C:\\Users\\Krzysztof Samordak\\OneDrive - 3Shape A S\\Documents\\Programs and scripts\\C#\\PE_MB_Tester\\PE_MB Tester\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Krzysztof Samordak\\AppData\\Roaming\\NuGet\\NuGet.Config",

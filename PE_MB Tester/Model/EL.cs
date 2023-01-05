@@ -11,6 +11,7 @@ namespace PE_MB_Tester.ELs
     class EL
     {
         const int _KtELconnected = 111;
+        const double divider = 1000;
         public double _measuredValueMinLimit = 0;
         public double _measuredValueMaxLimit = 1.3;
         string _resourceName = "";
@@ -100,11 +101,11 @@ namespace PE_MB_Tester.ELs
                 {
                     returnValue[1] = returnValue[1] + proc.StandardOutput.ReadLine() + "; ";
                 }
-                testResult = (double)proc.ExitCode / 100;
+                testResult = ((double)proc.ExitCode) / divider;
                 _lastTestResultValue = testResult;
                 if (testResult >= _measuredValueMinLimit && testResult <= _measuredValueMaxLimit)
                 {
-                    returnValue[0] = "Test - PASS" + "&" + testResult;
+                    returnValue[0] = "Test - PASS, result: " + testResult;
                     _lastTestResult = true;
                 }
             }

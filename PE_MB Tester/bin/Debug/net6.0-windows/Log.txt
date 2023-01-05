@@ -1,0 +1,17 @@
+
+Log Entry: 11:14:28 Thursday, January 5, 2023: Connection - FAIL
+; KtEL30000 control app; ; Couldn't connect. Error is:; Ivi.Visa.NativeVisaException: Invalid Resource or the instrument is not available.; Resource Name: 'USB0::0x2A8D::0x3702::MY60260113::0::INSTR'; Native VISA error code: ERROR_RSRC_NFOUND (-1073807343);    at Ivi.Visa.GlobalResourceManager.Open(String resourceName, AccessModes accessModes, Int32 timeoutMilliseconds, ResourceOpenStatus& openStatus);    at ThreeShape.KtEL30000_connect.Program.Main(String[] args); Press any key to exit...; 
+
+---------------------------------------------
+
+Log Entry : 11:14:31 Thursday, January 5, 2023:   Detect of inserted device event started
+---------------------------------------------
+
+Log Entry : 11:14:31 Thursday, January 5, 2023:   Detect of removed device event started
+---------------------------------------------
+
+Log Entry : 11:14:31 Thursday, January 5, 2023:   Open, close for auto start
+---------------------------------------------
+
+Log Entry : 11:14:31 Thursday, January 5, 2023:   1.24
+---------------------------------------------
