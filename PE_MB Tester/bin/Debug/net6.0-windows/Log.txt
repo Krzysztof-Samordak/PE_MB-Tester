@@ -1,17 +1,93 @@
 
-Log Entry: 11:14:28 Thursday, January 5, 2023: Connection - FAIL
-; KtEL30000 control app; ; Couldn't connect. Error is:; Ivi.Visa.NativeVisaException: Invalid Resource or the instrument is not available.; Resource Name: 'USB0::0x2A8D::0x3702::MY60260113::0::INSTR'; Native VISA error code: ERROR_RSRC_NFOUND (-1073807343);    at Ivi.Visa.GlobalResourceManager.Open(String resourceName, AccessModes accessModes, Int32 timeoutMilliseconds, ResourceOpenStatus& openStatus);    at ThreeShape.KtEL30000_connect.Program.Main(String[] args); Press any key to exit...; 
+Log Entry: 15:24:14 Monday, January 9, 2023: Connection - PASS
+; KtEL30000 control app; ; Command *IDN? returned: Keysight Technologies,EL33133A,MY60260113,1.2.3-1.0.6-17-114; ; ; Return value: 111; ; 
 
 ---------------------------------------------
 
-Log Entry : 11:14:31 Thursday, January 5, 2023:   Detect of inserted device event started
+Log Entry : 15:24:14 Monday, January 9, 2023:   Detect of inserted device event started
 ---------------------------------------------
 
-Log Entry : 11:14:31 Thursday, January 5, 2023:   Detect of removed device event started
+Log Entry : 15:24:14 Monday, January 9, 2023:   Detect of removed device event started
 ---------------------------------------------
 
-Log Entry : 11:14:31 Thursday, January 5, 2023:   Open, close for auto start
+Log Entry : 15:24:14 Monday, January 9, 2023:   Open, close for auto start
 ---------------------------------------------
 
-Log Entry : 11:14:31 Thursday, January 5, 2023:   1.24
+Log Entry : 15:24:14 Monday, January 9, 2023:   1.24
+---------------------------------------------
+
+Log Entry: 15:24:16 Monday, January 9, 2023: Connection - PASS
+; KtEL30000 control app; ; Command *IDN? returned: Keysight Technologies,EL33133A,MY60260113,1.2.3-1.0.6-17-114; ; ; Return value: 111; ; 
+
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   Test sequence started manually.
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   HubController detected
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   USB\VID_0424&PID_2514\B&325B2FD7&0&4
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   Generic USB Hub
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   UsbCompositeDevice detected
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   USB\VID_08BB&PID_2912\C&310C3E98&0&2
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   USB Composite Device
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   FlashDisk detected
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   USBSTOR\DISK&VEN_GENERAL&PROD_UDISK&REV_5.00\A&3A745B79&0&_&0
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   General UDisk USB Device
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   PenDrive detected
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   USB\VID_ABCD&PID_1234\C&310C3E98&0&4
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   USB Mass Storage Device
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   AudioController detected
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   USB\VID_08BB&PID_2912&MI_00\D&270A29A5&0&0000
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   USB audio CODEC
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   FlashDisk detected
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   USBSTOR\DISK&VEN_GENERAL&PROD_UDISK&REV_5.00\D&2E7C95A4&0&_&0
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   General UDisk USB Device
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   PenDrive detected
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   USB\VID_ABCD&PID_1234\9&3686C01E&0&2
+---------------------------------------------
+
+Log Entry : 15:24:16 Monday, January 9, 2023:   USB Mass Storage Device
+---------------------------------------------
+
+Log Entry: 15:24:18 Monday, January 9, 2023: Test - FAIL
+; KtEL30000 control app; ; Write command: FUNC CURR, ; Command: FUNC?  returned: CURR; OK; ; Write command: CURR 0.01; Command: CURR? returned: 0.01; OK; ; Write command: INP ON, ; ; Write command: CURR 1.17; Command: CURR? returned: +1.17000000E+00; OK; ; Command: MEAS:CURR? returned: -0.0006563309 - Power limiter activated!!!; ; ; Write command: INP OFF, ; ; Command: MEAS:VOLT? returned: -4.65494800E-04; Voltage after turning input off: -0.0004654948V; ;                                  ###########################; ;                                          Voltage: 0V; ;                                  ###########################; ;                                       Test Result: 1.17A; ;                                  ###########################; ; Return value: 1170; ; 
+
 ---------------------------------------------

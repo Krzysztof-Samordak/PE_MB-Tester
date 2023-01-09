@@ -14,6 +14,8 @@ namespace PE_MB_Tester.USBDevices
         string _vidPid;
         public string expectedVidPid;
         public string expectedName;
+        public bool lastTestResult;
+
         public USBDevice()
         {
             _isInserted = false;
@@ -111,6 +113,10 @@ namespace PE_MB_Tester.USBDevices
         public string ReturnVid()
         {
             return expectedVidPid;
+        }
+        public void clearLastTestResult()
+        {
+            lastTestResult = false;
         }
     }
 }

@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace PE_MB_Tester.Tests
 {
-    internal class Test
+    public class Test
     {
         const string pass = "PASS";
         const string fail = "FAIL";
         private string _result;
-        public int id { get; set; }
-        public string name { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
         public string value { get; set; }
         public string result
         {

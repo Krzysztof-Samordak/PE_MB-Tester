@@ -19,27 +19,31 @@ using PE_MB_Tester.Commands;
 using PE_MB_Tester.USBDevices;
 using PE_MB_Tester.ELs;
 using PE_MB_Tester.Tests;
-
+using System.Collections.ObjectModel;
 namespace PE_MB_Tester.MainViewModel
 {
     public class MainViewModel : INotifyPropertyChanged
     {
         //USB Devices initialization
         FT232 _relayController = new FT232();
-        Logger logger = new Logger();
-        USBDevice penDrive = new USBDevice();
-        USBDevice hubController = new USBDevice();
-        USBDevice usbCompositeDevice = new USBDevice();
-        USBDevice audioController = new USBDevice();
-        USBDevice networkAdapter = new USBDevice();
-        USBDevice flashDisk = new USBDevice();
-        EL KtEL34143a = new EL();
+        Logger _logger = new Logger();
+        USBDevice _penDrive = new USBDevice();
+        USBDevice _hubController = new USBDevice();
+        USBDevice _usbCompositeDevice = new USBDevice();
+        USBDevice _audioController = new USBDevice();
+        USBDevice _networkAdapter = new USBDevice();
+        USBDevice _flashDisk = new USBDevice();
+        EL _ktEL34143a = new EL();
 
         //Timer setup
         const int time = 10;
-        DispatcherTimer dispatcherTimer = new DispatcherTimer();
+        DispatcherTimer _dispatcherTimer = new DispatcherTimer();
+
+        //Set number of tests to perform
+        const int setNumberOfTests = 4;
 
         //Auxiliary variables
+        int _numberOfTests = setNumberOfTests;
         const string en = "True";
         const string dis = "False";
         const string ready = "Open, close for auto start";
@@ -51,20 +55,27 @@ namespace PE_MB_Tester.MainViewModel
 
         //View variables setup
         private string _elStatus = "Disconnected";
-        private string _startStopButton = en;
+        private string _startButton = en;
         private string _testerStatus;
         private string _testerStatusColor;
         private string _testResult;
         private string _testResultColor;
         private string _elStatusColor = "Red";
-        private string _usbTestResult;
-        private string _powerLimiterTestResult;
+        private ObservableCollection<Test> _tests;
 
-        //Create tests list
-        List<Test> tests = new List<Test>();
+        //Create ICommand object
+        public ICommand startTestCommand { get; set; }
 
-        public ICommand startStopTestCommand { get; set; }
+        public ObservableCollection<Test> tests
+        {
+            get { return _tests; }
 
+            set
+            {
+                _tests = value;
+                OnPropertyChanged();
+            }
+        }
         public string testerStatusColor
         {
             get { return _testerStatusColor; }
@@ -78,14 +89,14 @@ namespace PE_MB_Tester.MainViewModel
                 }
             }
         }
-        public string startStopButton
+        public string startButton
         {
-            get { return _startStopButton; }
+            get { return _startButton; }
             set
             {
                 if (value == en || value == dis)
                 {
-                    _startStopButton = value;
+                    _startButton = value;
                     OnPropertyChanged();
                 }
             }
@@ -136,50 +147,6 @@ namespace PE_MB_Tester.MainViewModel
                 }
             }
         }
-        public string usbTestResult
-        {
-            get { return _usbTestResult; }
-            set
-            {
-                if (value == pass)
-                {
-                    _usbTestResult = value;
-                    OnPropertyChanged();
-                }
-                else if (value == fail)
-                {
-                    _usbTestResult = value;
-                    OnPropertyChanged();
-                }
-                else if (value == clear)
-                {
-                    _usbTestResult = "";
-                    OnPropertyChanged();
-                }
-            }
-        }
-        public string powerLimiterTestResult
-        {
-            get { return _powerLimiterTestResult; }
-            set
-            {
-                if (value == pass)
-                {
-                    _powerLimiterTestResult = value;
-                    OnPropertyChanged();
-                }
-                else if (value == fail)
-                {
-                    _powerLimiterTestResult = value;
-                    OnPropertyChanged();
-                }
-                else if (value == clear)
-                {
-                    _powerLimiterTestResult = "";
-                    OnPropertyChanged();
-                }
-            }
-        }
         public string testResultColor
         {
             get { return _testResultColor; }
@@ -220,13 +187,14 @@ namespace PE_MB_Tester.MainViewModel
 
         public MainViewModel()
         {
+            //Read Configuration file and attach values do adequate variables
             ReadConfig();
 
-            startStopTestCommand = new RelayCommand(StartStopTestClick);
+            startTestCommand = new RelayCommand(StartTestClick);
 
             //Create tests list
-            tests.Add(new Test() { id = 0, name = "USB Controller Test", value = "", result = "" });
-            tests.Add(new Test() { id = 1, name = "Power Limiter Test", value = "", result = "" });
+            tests = new ObservableCollection<Test>();
+
 
             /*            logger.logMultiple(_relayController.FindDevices(), "Found FTDI devices: ");
                         logger.log("Required FTDI device is connected: " + (_relayController.Connect()).ToString());
@@ -237,8 +205,8 @@ namespace PE_MB_Tester.MainViewModel
              */
 
             //setup Timer
-            dispatcherTimer.Tick += DispatcherTimerTick;
-            dispatcherTimer.Interval = new TimeSpan(0, 0, time);
+            _dispatcherTimer.Tick += DispatcherTimerTick;
+            _dispatcherTimer.Interval = new TimeSpan(0, 0, time);
 
             //check for required devices
             checkRequiredDevices();
@@ -248,9 +216,10 @@ namespace PE_MB_Tester.MainViewModel
 
             //set the Test Setup to ready
             testerStatus = ready;
-            logger.log(ready);
-            logger.log(KtEL34143a._measuredValueMaxLimit.ToString());
+            _logger.log(ready);
+            _logger.log(_ktEL34143a._measuredValueMaxLimit.ToString());
         }
+
         ~MainViewModel()
         {
             //           _relayController.TurnOffAllPins();
@@ -285,27 +254,27 @@ namespace PE_MB_Tester.MainViewModel
                     ConfigurationManager.AppSettings.Get("ElMaxTestLimit") is not null)
                 {
                     _relayController.setRequiredSerialNumber(ConfigurationManager.AppSettings.Get("ftdiSerialNumber"));
-                    penDrive.GetExpextedVid(ConfigurationManager.AppSettings.Get("PenDriveVid"));
-                    penDrive.GetExpextedName(ConfigurationManager.AppSettings.Get("PenDriveName"));
+                    _penDrive.GetExpextedVid(ConfigurationManager.AppSettings.Get("PenDriveVid"));
+                    _penDrive.GetExpextedName(ConfigurationManager.AppSettings.Get("PenDriveName"));
 
-                    hubController.GetExpextedVid(ConfigurationManager.AppSettings.Get("UsbHubControllerVid"));
-                    hubController.GetExpextedName(ConfigurationManager.AppSettings.Get("UsbHubControllerName"));
+                    _hubController.GetExpextedVid(ConfigurationManager.AppSettings.Get("UsbHubControllerVid"));
+                    _hubController.GetExpextedName(ConfigurationManager.AppSettings.Get("UsbHubControllerName"));
 
-                    audioController.GetExpextedVid(ConfigurationManager.AppSettings.Get("UsbAudioControllerVid"));
-                    audioController.GetExpextedName(ConfigurationManager.AppSettings.Get("UsbAudioControllerName"));
+                    _audioController.GetExpextedVid(ConfigurationManager.AppSettings.Get("UsbAudioControllerVid"));
+                    _audioController.GetExpextedName(ConfigurationManager.AppSettings.Get("UsbAudioControllerName"));
 
-                    usbCompositeDevice.GetExpextedVid(ConfigurationManager.AppSettings.Get("UsbCompositeDeviceVid"));
-                    usbCompositeDevice.GetExpextedName(ConfigurationManager.AppSettings.Get("UsbCompositeDeviceName"));
+                    _usbCompositeDevice.GetExpextedVid(ConfigurationManager.AppSettings.Get("UsbCompositeDeviceVid"));
+                    _usbCompositeDevice.GetExpextedName(ConfigurationManager.AppSettings.Get("UsbCompositeDeviceName"));
 
-                    networkAdapter.GetExpextedVid(ConfigurationManager.AppSettings.Get("NetworkAdapterVid"));
-                    networkAdapter.GetExpextedName(ConfigurationManager.AppSettings.Get("NetworkAdapterName"));
+                    _networkAdapter.GetExpextedVid(ConfigurationManager.AppSettings.Get("NetworkAdapterVid"));
+                    _networkAdapter.GetExpextedName(ConfigurationManager.AppSettings.Get("NetworkAdapterName"));
 
-                    flashDisk.GetExpextedVid(ConfigurationManager.AppSettings.Get("FlashDiskVid"));
-                    flashDisk.GetExpextedName(ConfigurationManager.AppSettings.Get("FlashDiskName"));
+                    _flashDisk.GetExpextedVid(ConfigurationManager.AppSettings.Get("FlashDiskVid"));
+                    _flashDisk.GetExpextedName(ConfigurationManager.AppSettings.Get("FlashDiskName"));
 
-                    KtEL34143a.setVisaAdress(ConfigurationManager.AppSettings.Get("ElVisaAdress"));
-                    KtEL34143a.setControlAppName(ConfigurationManager.AppSettings.Get("ElControlAppName"));
-                    KtEL34143a.setTestLimits(Convert.ToDouble(ConfigurationManager.AppSettings.Get("ElMinTestLimit")), Convert.ToDouble(ConfigurationManager.AppSettings.Get("ElMaxTestLimit")));
+                    _ktEL34143a.setVisaAdress(ConfigurationManager.AppSettings.Get("ElVisaAdress"));
+                    _ktEL34143a.setControlAppName(ConfigurationManager.AppSettings.Get("ElControlAppName"));
+                    _ktEL34143a.setTestLimits(Convert.ToDouble(ConfigurationManager.AppSettings.Get("ElMinTestLimit")), Convert.ToDouble(ConfigurationManager.AppSettings.Get("ElMaxTestLimit")));
                 }
                 else
                 {
@@ -314,7 +283,7 @@ namespace PE_MB_Tester.MainViewModel
             }
             catch (Exception ex)
             {
-                logger.log(ex.ToString());
+                _logger.log(ex.ToString());
                 MessageBox.Show(ex.Message);
             }
         }
@@ -326,14 +295,14 @@ namespace PE_MB_Tester.MainViewModel
             ManagementEventWatcher insertUSBWatcher = new ManagementEventWatcher(insertUSBQuery);
             insertUSBWatcher.EventArrived += new EventArrivedEventHandler(DeviceInsertedEvent);
             insertUSBWatcher.Start();
-            logger.log("Detect of inserted device event started");
+            _logger.log("Detect of inserted device event started");
 
             WqlEventQuery removeUSBQuery = new WqlEventQuery("SELECT * FROM __InstanceDeletionEvent WITHIN 2 WHERE TargetInstance ISA " +
                 "'Win32_PnPEntity'");
             ManagementEventWatcher removeUSBWatcher = new ManagementEventWatcher(removeUSBQuery);
             removeUSBWatcher.EventArrived += new EventArrivedEventHandler(DeviceRemovedEvent);
             removeUSBWatcher.Start();
-            logger.log("Detect of removed device event started");
+            _logger.log("Detect of removed device event started");
         }
 
         void DeviceInsertedEvent(object sender, EventArrivedEventArgs e)
@@ -346,7 +315,7 @@ namespace PE_MB_Tester.MainViewModel
             vidPid = (string)instance.GetPropertyValue("PNPDeviceID");
             name = (string)instance.GetPropertyValue("Name");
             status = (string)instance.GetPropertyValue("Status");
-            logger.log("Detected Device: " + name + ", Vid/Pid: " + vidPid + ", Status: " + status);
+            _logger.log("Detected Device: " + name + ", Vid/Pid: " + vidPid + ", Status: " + status);
             if (status == "OK")
             {
                 InsertChekAllIds(vidPid, name);
@@ -361,102 +330,90 @@ namespace PE_MB_Tester.MainViewModel
             ManagementBaseObject instance = (ManagementBaseObject)e.NewEvent["TargetInstance"];
             vidPid = (string)instance.GetPropertyValue("PNPDeviceID");
             name = (string)instance.GetPropertyValue("Name");
-            logger.log("Removed device: " + name + ", Vid/Pid: " + vidPid);
+            _logger.log("Removed device: " + name + ", Vid/Pid: " + vidPid);
             RemoveChekAllIds(vidPid, name);
         }
 
         bool InsertChekAllIds(string Vid_Pid, string Name)
         {
             bool returnValue = false;
-            if (flashDisk.InsertCheck(Vid_Pid, Name))
+            if (_flashDisk.InsertCheck(Vid_Pid, Name))
             {
                 CheckTestStatus();
-                logger.log("FlashDisk detected");
+                _logger.log("FlashDisk detected");
+                _flashDisk.lastTestResult = true;
                 returnValue = true;
-                if (penDrive.checkIfInserted() && hubController.checkIfInserted())
-                {
-                }
             }
-            else if (penDrive.InsertCheckIdAndName(Vid_Pid, Name))
+            else if (_penDrive.InsertCheckIdAndName(Vid_Pid, Name))
             {
                 CheckTestStatus();
-                logger.log("PenDrive detected");
+                _logger.log("PenDrive detected");
+                _penDrive.lastTestResult = true;
                 returnValue = true;
-                if (flashDisk.checkIfInserted() && hubController.checkIfInserted())
-                {
-                }
             }
-            else if (hubController.InsertCheckIdAndName(Vid_Pid, Name))
+            else if (_hubController.InsertCheckIdAndName(Vid_Pid, Name))
             {
                 CheckTestStatus();
-                logger.log("HubController detected");
+                _logger.log("HubController detected");
+                _hubController.lastTestResult = true;
                 returnValue = true;
-                if (penDrive.checkIfInserted() && flashDisk.checkIfInserted())
-                {
-
-                }
             }
-            else if (audioController.InsertCheckIdAndName(Vid_Pid, Name))
+            else if (_audioController.InsertCheckIdAndName(Vid_Pid, Name))
             {
                 CheckTestStatus();
-                logger.log("AudioController detected");
+                _logger.log("AudioController detected");
+                _audioController.lastTestResult = true;
                 returnValue = true;
-                if (usbCompositeDevice.checkIfInserted())
-                {
-                }
             }
-            else if (networkAdapter.InsertCheckIdAndName(Vid_Pid, Name))
+            else if (_networkAdapter.InsertCheckIdAndName(Vid_Pid, Name))
             {
                 CheckTestStatus();
-                logger.log("NetworkAdapter detected");
+                _logger.log("NetworkAdapter detected");
+                _networkAdapter.lastTestResult = true;
                 returnValue = true;
             }
-            else if (usbCompositeDevice.InsertCheckIdAndName(Vid_Pid, Name))
+            else if (_usbCompositeDevice.InsertCheckIdAndName(Vid_Pid, Name))
             {
                 CheckTestStatus();
-                logger.log("UsbCompositeDevice detected");
+                _logger.log("UsbCompositeDevice detected");
+                _usbCompositeDevice.lastTestResult = true;
                 returnValue = true;
-                if (audioController.checkIfInserted())
-                {
-
-                }
             }
-            if (penDrive.checkIfInserted() && flashDisk.checkIfInserted() && hubController.checkIfInserted() &&
-                usbCompositeDevice.checkIfInserted() && audioController.checkIfInserted() && networkAdapter.checkIfInserted())
+            if (_penDrive.checkIfInserted() && _flashDisk.checkIfInserted() && _hubController.checkIfInserted() &&
+                _usbCompositeDevice.checkIfInserted() && _audioController.checkIfInserted() && _networkAdapter.checkIfInserted())
             {
-                UsbTestPass();
                 // Perform limiter test
-                FinishTest();
+                startButton = en;
             }
             return returnValue;
         }
 
         void RemoveChekAllIds(string Vid_Pid, string Name)
         {
-            if (penDrive.RemoveCheckId(Vid_Pid))
+            if (_penDrive.RemoveCheckId(Vid_Pid))
             {
             }
-            else if (flashDisk.RemoveCheckId(Vid_Pid))
+            else if (_flashDisk.RemoveCheckId(Vid_Pid))
             {
             }
-            else if (hubController.RemoveCheckId(Vid_Pid))
+            else if (_hubController.RemoveCheckId(Vid_Pid))
             {
             }
-            else if (audioController.RemoveCheckId(Vid_Pid))
+            else if (_audioController.RemoveCheckId(Vid_Pid))
             {
             }
-            else if (networkAdapter.RemoveCheckId(Vid_Pid))
+            else if (_networkAdapter.RemoveCheckId(Vid_Pid))
             {
             }
-            else if (usbCompositeDevice.RemoveCheckId(Vid_Pid))
+            else if (_usbCompositeDevice.RemoveCheckId(Vid_Pid))
             {
             }
-            if (!penDrive.checkIfInserted() && !flashDisk.checkIfInserted() && !hubController.checkIfInserted() &&
-                !usbCompositeDevice.checkIfInserted() && !audioController.checkIfInserted() && !networkAdapter.checkIfInserted())
+            if (!_penDrive.checkIfInserted() && !_flashDisk.checkIfInserted() && !_hubController.checkIfInserted() &&
+                !_usbCompositeDevice.checkIfInserted() && !_audioController.checkIfInserted() && !_networkAdapter.checkIfInserted())
             {
                 TimerStop();
                 testerStatus = ready;
-                logger.log(ready);
+                _logger.log(ready);
             }
         }
 
@@ -470,75 +427,59 @@ namespace PE_MB_Tester.MainViewModel
 
         public void StartTest()
         {
-            startStopButton = dis;
+            startButton = dis;
             testerStatus = testInprogress;
             testResult = clear;
             TimerStart(time);
-            logger.log("Running test sequence.");
+            _logger.log("Running test sequence.");
         }
 
         public void ManualStartTest()
         {
-            startStopButton = dis;
+            startButton = dis;
             testerStatus = testInprogress;
             testResult = clear;
-            logger.log("Test sequence started manually.");
-        }
-
-        public void FinishTest()
-        {
-            startStopButton = en;
+            _logger.log("Test sequence started manually.");
         }
 
         public void TimerStart(int time)
         {
-            dispatcherTimer.Interval = new TimeSpan(0, 0, time);
-            dispatcherTimer.Start();
-            logger.log("Running timer.");
+            _dispatcherTimer.Interval = new TimeSpan(0, 0, time);
+            _dispatcherTimer.Start();
+            _logger.log("Running timer.");
         }
 
         public void TimerStop()
         {
-            if (dispatcherTimer.IsEnabled)
+            if (_dispatcherTimer.IsEnabled)
             {
-                dispatcherTimer.Stop();
-                logger.log("Timer stopped.");
+                _dispatcherTimer.Stop();
+                _logger.log("Timer stopped.");
             }
         }
 
         private void DispatcherTimerTick(object sender, EventArgs e)
         {
             TimerStop();
-            UsbTestFail();
             // Perform limiter test
-            FinishTest();
+            startButton = en;
         }
 
-        public void UsbTestFail()
+        private void StartTestClick(object obj)
         {
-            usbTestResult = fail;
-            logger.log("USB Test FAIL!");// Zmien na USB test Result fail
-            //testerStatus = testFinished;          Zmien na USB Test Finished
-        }
-        public void UsbTestPass()
-        {
-            TimerStop();
-            logger.log("USB Test PASS!");
-            usbTestResult = pass;                      // Zmien na USB test Result pass
-//            testerStatus = testFinished;          Zmien na USB Test Finished
+            tests.Clear();
+            checkRequiredDevices();
+            clearAllUSBLastTestResults();
+            ThreadPool.QueueUserWorkItem(new WaitCallback(USBTest));
+            ThreadPool.QueueUserWorkItem(new WaitCallback(PowerLimiterTest));
+
         }
 
-        private void StartStopTestClick(object obj)
-        {
-            ThreadPool.QueueUserWorkItem(new WaitCallback(StartStopTest));
-        }
-
-        private void StartStopTest(object obj)
+        private void USBTest(object obj)
         {
             string vidPid = "";
             string name = "";
             string status = "";
-            double result;
 
             ManualStartTest();
             foreach (ManagementObject device in new ManagementObjectSearcher(String.Format(@"SELECT * FROM Win32_PNPEntity")).Get())
@@ -550,44 +491,147 @@ namespace PE_MB_Tester.MainViewModel
                 {
                     if(InsertChekAllIds(vidPid, name))
                     {
-                        logger.log(vidPid);
-                        logger.log(name);
+                        _logger.log(vidPid);
+                        _logger.log(name);
                     }
                 }
             }
-            if (testResult != pass)
-            {
-                //UsbTestFail();
-            }
-            if (checkRequiredDevices())
-            {
-                logger.logMultiple(KtEL34143a.test());
-                if (KtEL34143a.getTestResult())
-                {
-                    // TEST PASS
-                }
-            }
-            startStopButton = en;
+            App.Current.Dispatcher.Invoke(new Action(() =>checkUSBTestResults()));
+            checkIfFinishedAllTests();
         }
 
         bool checkRequiredDevices()
         {
             bool returnValue = false;
 
-            logger.logMultiple(KtEL34143a.checkConnection());
-            if (!KtEL34143a.isConnected())
+            _logger.logMultiple(_ktEL34143a.checkConnection());
+            if (!_ktEL34143a.isConnected())
             {
                 MessageBox.Show("Cannot find the Electronic load device!");
                 elStatusColor = "Red";
                 elStatus = "Disconnected";
+                _numberOfTests = setNumberOfTests - 1;
             }
             else
             {
                 elStatusColor = "Green";
                 elStatus = "Connected";
+                _numberOfTests = setNumberOfTests;
                 returnValue = true;
             }
             return returnValue;
+        }
+
+        public void PassTest(int id, string name)
+        {
+            Test tmp = new Test { Id = id, Name = name, value = "", result = "" };
+            if (tests.Contains(tmp))
+            {
+                tests.First(s => s.Name == tmp.Name).value = en;
+                tests.First(s => s.Name == tmp.Name).result = pass;
+            }
+            else
+            {
+                tests.Add(new Test() { Id = id, Name = "name", value = en, result = pass });
+            }
+        }
+
+        public void clearAllUSBLastTestResults()
+        {
+            _penDrive.clearLastTestResult();
+            _flashDisk.clearLastTestResult();
+            _hubController.clearLastTestResult();
+            _usbCompositeDevice.clearLastTestResult();
+            _audioController.clearLastTestResult();
+            _networkAdapter.clearLastTestResult();
+        }
+
+        public void checkUSBTestResults()
+        {
+            if (_penDrive.lastTestResult == true && _hubController.lastTestResult == true && _flashDisk.lastTestResult == true)
+            {
+                tests.Add(new Test() { Id = 01, Name = "USB Controller Detection", value = en, result = pass });
+            }
+            else
+            {
+                tests.Add(new Test() { Id = 01, Name = "USB Controller Detection", value = dis, result = fail });
+            }
+            if (_audioController.lastTestResult == true && _usbCompositeDevice.lastTestResult == true)
+            {
+                tests.Add(new Test() { Id = 02, Name = "Sound Controller Detection", value = en, result = pass });
+            }
+            else
+            {
+                tests.Add(new Test() { Id = 02, Name = "Sound Controller Detection", value = dis, result = fail });
+            }
+            if (_networkAdapter.lastTestResult == true)
+            {
+                tests.Add(new Test() { Id = 03, Name = "Network Adapter Detection", value = en, result = pass });
+            }
+            else
+            {
+                tests.Add(new Test() { Id = 03, Name = "Network Adapter Detection", value = dis, result = fail });
+            }
+        }
+
+        public void PowerLimiterTest(object obj)
+        {
+            double result;
+
+
+            if (_ktEL34143a.isConnected())
+            {
+                _logger.logMultiple(_ktEL34143a.test());
+                result = _ktEL34143a.getTestResultValue();
+                if (_ktEL34143a.getTestResult())
+                {
+                    App.Current.Dispatcher.Invoke(new Action(() => { tests.Add(new Test() { Id = 04, Name = "Power Limiter Test", value = Convert.ToString(result), result = pass }); }));
+                }
+                else
+                {
+                    App.Current.Dispatcher.Invoke(new Action(() => { tests.Add(new Test() { Id = 04, Name = "Power Limiter Test", value = Convert.ToString(result), result = fail }); }));
+                }
+            }
+            checkIfFinishedAllTests();
+        }
+
+        public void checkIfFinishedAllTests()
+        {
+            bool testsFinished = false;
+            bool testsPassed = false;
+
+            if (testerStatus == testInprogress)
+            {
+                if (tests.Count == _numberOfTests)
+                {
+                    testsFinished = true;
+                    testsPassed = true;
+                    for (int i = 0; i < _numberOfTests; i++)
+                    {
+                        if (tests.ElementAt(i).result == "")
+                        {
+                            testsFinished = false;
+                        }
+                        if (tests.ElementAt(i).result != pass)
+                        {
+                            testsPassed = false;
+                        }
+                    }
+                    if (testsFinished)
+                    {
+                        startButton = en;
+                        if (testsPassed)
+                        {
+                            testResult = pass;
+                        }
+                        else
+                        {
+                            testResult = fail;
+                        }
+                    }
+                    testerStatus = testFinished;
+                }
+            }
         }
     }
 }
