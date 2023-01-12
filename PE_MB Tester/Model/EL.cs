@@ -1,4 +1,5 @@
-﻿using System;
+﻿/// <copyright>3Shape A/S</copyright>
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,8 +12,9 @@ namespace PE_MB_Tester.ELs
     class EL
     {
         const int _KtELconnected = 111;
-        public double _measuredValueMinLimit = 0;
-        public double _measuredValueMaxLimit = 1.3;
+        const double divider = 1000;
+        public double measuredValueMinLimit = 0;
+        public double measuredValueMaxLimit = 1.3;
         string _resourceName = "";
         string _fileName = "";
         bool _isConnected = false;
@@ -100,11 +102,11 @@ namespace PE_MB_Tester.ELs
                 {
                     returnValue[1] = returnValue[1] + proc.StandardOutput.ReadLine() + "; ";
                 }
-                testResult = (double)proc.ExitCode / 100;
+                testResult = ((double)proc.ExitCode) / divider;
                 _lastTestResultValue = testResult;
-                if (testResult >= _measuredValueMinLimit && testResult <= _measuredValueMaxLimit)
+                if (testResult >= measuredValueMinLimit && testResult <= measuredValueMaxLimit)
                 {
-                    returnValue[0] = "Test - PASS" + "&" + testResult;
+                    returnValue[0] = "Test - PASS, result: " + testResult;
                     _lastTestResult = true;
                 }
             }
@@ -112,8 +114,8 @@ namespace PE_MB_Tester.ELs
         }
         public void setTestLimits(double minTestLimit, double maxTestLimit)
         {
-            _measuredValueMinLimit = minTestLimit;
-            _measuredValueMaxLimit = maxTestLimit;
+            measuredValueMinLimit = minTestLimit;
+            measuredValueMaxLimit = maxTestLimit;
         }
         public double getTestResultValue()
         {

@@ -5,31 +5,70 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PE_MB_Tester"
         mc:Ignorable="d"
-        Title="3Shape PE_MB Tester" Height="450" Width="800" 
+        Title="3Shape PE_MB Tester"
+        Height="500" Width="800"
+        WindowStyle="None"
+        Background="Transparent"
+        AllowsTransparency="True"
+        MouseDown="Window_MouseDown"
+        WindowStartupLocation="CenterScreen"
         Closing="WindowClosing">
-    <Grid Margin="0,0,0,301">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition />
-            <ColumnDefinition />
-            <ColumnDefinition />
-            <ColumnDefinition />
+    <Border Background="#272537"
+                CornerRadius="20">
+        <Grid Margin="20,0,20,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
 
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
-            <RowDefinition/>
-            <RowDefinition Height="40"/>
-        </Grid.RowDefinitions>
-        <Label x:Name="StatusS_Label" Content="{Binding TesterStatus}" FontSize="20" Foreground="{Binding TesterStatusColor}" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" FontWeight="Bold" Width="320" Grid.ColumnSpan="2" VerticalAlignment="Center" Height="44"/>
-        <Label x:Name="Status_Label" Content="Tester Status:" FontSize="20" Grid.Row="1" HorizontalAlignment="Center" FontWeight="Bold" VerticalAlignment="Center" Height="44"/>
-        <Button x:Name="StartTest_Button" Content="Start test" HorizontalAlignment="Center" VerticalAlignment="Center" Height="44" Width="140"  Command="{Binding StartStopTestCommand}" Grid.Column="3" Grid.Row="1" FontSize="20" FontWeight="Bold" IsEnabled="{Binding startStopButton}"/>
-        <Label x:Name="ResultS_Label" Content="{Binding TestResult}" FontSize="20" HorizontalAlignment="Center" Foreground="{Binding TestResultColor}" Grid.Row="2" VerticalAlignment="Center" Width="160" Height="40" Grid.Column="3" FontWeight="Bold"/>
-        <Label x:Name="Result_Label" Content="Test Result:" FontSize="20" HorizontalAlignment="Center" Grid.Row="3" VerticalAlignment="Center" Width="160" Height="40" Grid.Column="2" FontWeight="Bold"/>
-        <Label x:Name="ElStastus_Label" Content="DC Electronic Load status:" FontSize="14" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center" />
-        <Label x:Name="ElStastusS_Label" Content="{Binding ElStatus}" FontSize="14" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="40,0,0,0" />
-        <Ellipse Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left" Height="12" Stroke="White" VerticalAlignment="Center" Width="12" Fill="{Binding ElStatusColor}" Margin="20,0,0,0"/>
-    </Grid>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+
+            </Grid.RowDefinitions>
+            <Label x:Name="StatusS_Label" Content="{Binding testerStatus}" FontSize="20" Foreground="{Binding testerStatusColor}"
+                   Grid.Row="2" HorizontalAlignment="Left" FontWeight="Bold" Width="320" Grid.ColumnSpan="4"
+                   VerticalAlignment="Center" Height="44" Margin="150,0,0,0"/>
+            <Label x:Name="Status_Label" Content="Tester Status:" FontSize="20" Foreground="Azure" Grid.Row="2"
+                   HorizontalAlignment="Center" FontWeight="Bold" VerticalAlignment="Center" Height="44"/>
+            <Button Name="Close_Button" Content="x" Click="CloseButton_Click" Background="#353340" Foreground="Azure"
+                    BorderThickness="0" Grid.Row="0" Grid.Column="4" Margin="0,6,0,0" HorizontalAlignment="Right"
+                    VerticalAlignment="Top" Width="16"/>
+            <Button x:Name="StartTest_Button" Content="Start test" HorizontalAlignment="Center" Background="#353340"
+                    BorderThickness="0" VerticalAlignment="Center" Height="44" Width="140"
+                    Command="{Binding startTestCommand}" Grid.Column="3" Grid.Row="2"
+                    Foreground="Azure" FontSize="20" IsEnabled="{Binding startButton}"/>
+            <Label x:Name="ResultS_Label" Content="{Binding testResult}" FontSize="20" HorizontalAlignment="Center"
+                   Foreground="{Binding testResultColor}" Grid.Row="4" VerticalAlignment="Center" Width="160"
+                   Height="40" Grid.Column="3" FontWeight="Bold"/>
+            <Label x:Name="Result_Label" Content="Test Result:" FontSize="20" Foreground="Azure" HorizontalAlignment="Right"
+                   Grid.Row="4" Margin="-40" VerticalAlignment="Center" Width="160" Height="40"
+                   Grid.Column="2" FontWeight="Bold"/>
+            <Label x:Name="ElStastus_Label" Content="DC Electronic Load status:" Foreground="Azure" FontSize="14" Grid.Row="0"
+                   Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <Label x:Name="ElStastusS_Label" Content="{Binding elStatus}" FontSize="14" Foreground="Azure" Grid.Row="0"
+                   Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="40,0,0,0" />
+            <Ellipse Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left" Height="12" Stroke="White" VerticalAlignment="Center"
+                     Width="12" Fill="{Binding elStatusColor}" Margin="20,0,0,0"/>
+            <DataGrid Name="testsGrid" Background="Azure"
+                  ItemsSource="{Binding tests}" Grid.Row="6" Grid.RowSpan="5" Grid.Column="0" Grid.ColumnSpan="5" CanUserAddRows="False"
+                      CanUserDeleteRows="False" CanUserResizeRows="False" CanUserReorderColumns="False" CanUserResizeColumns="False"
+                      CanUserSortColumns="False" IsReadOnly="True" FontSize="20" AlternatingRowBackground="AliceBlue"
+                      RowBackground="azure">
+            </DataGrid>
+        </Grid>
+    </Border>
 </Window>
 
 

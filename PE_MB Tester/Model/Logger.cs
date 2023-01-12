@@ -25,31 +25,41 @@ public class Logger
     }
     public void log(string message)
     {
-        using (System.IO.StreamWriter writer = System.IO.File.AppendText(this._filePath))
+        try
         {
-            writer.Write("\r\nLog Entry : ");
-            writer.Write("{0} {1}", DateTime.Now.ToLongTimeString(), DateTime.Now.ToLongDateString());
-            writer.WriteLine(":   {0}", message);
-            writer.WriteLine("---------------------------------------------");
+            using (System.IO.StreamWriter writer = System.IO.File.AppendText(this._filePath))
+            {
+                writer.Write("\r\nLog Entry : ");
+                writer.Write("{0} {1}", DateTime.Now.ToLongTimeString(), DateTime.Now.ToLongDateString());
+                writer.WriteLine(":   {0}", message);
+                writer.WriteLine("---------------------------------------------");
+            }
+        }catch(Exception ex)
+        {
         }
     }
     public void logMultiple(string[] message, string optionalMessage = null)
     {
-        using (System.IO.StreamWriter writer = System.IO.File.AppendText(this._filePath))
+        try
         {
-            writer.Write("\r\nLog Entry: ");
-            writer.Write("{0} {1}: ", DateTime.Now.ToLongTimeString(), DateTime.Now.ToLongDateString());
-            if (optionalMessage != null)
+            using (System.IO.StreamWriter writer = System.IO.File.AppendText(this._filePath))
             {
-                writer.WriteLine(optionalMessage);
+                writer.Write("\r\nLog Entry: ");
+                writer.Write("{0} {1}: ", DateTime.Now.ToLongTimeString(), DateTime.Now.ToLongDateString());
+                if (optionalMessage != null)
+                {
+                    writer.WriteLine(optionalMessage);
+                }
+                for (int i = 0; i < message.Length; i++)
+                {
+                    writer.WriteLine(message[i]);
+                }
+                writer.WriteLine("");
+                writer.WriteLine("---------------------------------------------");
             }
-            for (int i = 0; i < message.Length; i++)
-            {
-                writer.WriteLine(message[i]);
-            }
-            writer.WriteLine("");
-            writer.WriteLine("---------------------------------------------");
         }
-
+        catch
+        {
+        }
     }
 }
