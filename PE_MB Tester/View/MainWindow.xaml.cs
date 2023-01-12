@@ -1,4 +1,5 @@
-﻿using System;
+﻿/// <copyright>3Shape A/S</copyright>
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,6 +32,18 @@ namespace PE_MB_Tester
         void WindowClosing(object sender, EventArgs e)
         {
             MessageBox.Show("Turn off the tester!");
+        }
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if(e.LeftButton == MouseButtonState.Pressed)
+            {
+                this.DragMove();
+            }
         }
     }
 }

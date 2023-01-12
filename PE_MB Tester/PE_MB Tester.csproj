@@ -3,13 +3,16 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
-    <RootNamespace>PE_MB_Tester</RootNamespace>
+    <RootNamespace>Three_Shape_PE_MB_Tester</RootNamespace>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FTD2XX.Net" Version="1.2.1" />
+    <Content Remove="C:\Users\Krzysztof Samordak\.nuget\packages\ftd2xx.net\1.2.1\contentFiles\any\netstandard2.1\FTDI2XX.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.Management" Version="7.0.0" />
     <PackageReference Include="ThreeShape.MSBuild.CodeCheck" Version="7.0.0">
       <PrivateAssets>all</PrivateAssets>

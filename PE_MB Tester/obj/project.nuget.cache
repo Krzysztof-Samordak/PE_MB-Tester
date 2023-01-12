@@ -1,10 +1,9 @@
 {
   "version": 2,
-  "dgSpecHash": "QZemWHMoVSuvOyRluElZ7xyvcfPjV7Ci+zuZwP8kLDWEvTd9dTgwNRebJlrOvfW4bYNAKgED2/yaa6F6m+r4dQ==",
+  "dgSpecHash": "4+KHc4N+/lU3mnHCaMC0tt1q6a0KWVSMsxiN9RCDdA76ZLmnu6dmzyIt2JmwIB9zKVSKsR499eNW8ze0FuWvAw==",
   "success": true,
   "projectFilePath": "C:\\Users\\Krzysztof Samordak\\OneDrive - 3Shape A S\\Documents\\Programs and scripts\\C#\\PE_MB_Tester\\PE_MB Tester\\PE_MB Tester.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Krzysztof Samordak\\.nuget\\packages\\ftd2xx.net\\1.2.1\\ftd2xx.net.1.2.1.nupkg.sha512",
     "C:\\Users\\Krzysztof Samordak\\.nuget\\packages\\system.codedom\\7.0.0\\system.codedom.7.0.0.nupkg.sha512",
     "C:\\Users\\Krzysztof Samordak\\.nuget\\packages\\system.management\\7.0.0\\system.management.7.0.0.nupkg.sha512",
     "C:\\Users\\Krzysztof Samordak\\.nuget\\packages\\threeshape.msbuild.codecheck\\7.0.0\\threeshape.msbuild.codecheck.7.0.0.nupkg.sha512"
