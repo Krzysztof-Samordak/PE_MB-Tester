@@ -3,13 +3,33 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows</TargetFramework>
-    <RootNamespace>Three_Shape_PE_MB_Tester</RootNamespace>
+    <RootNamespace>PE_MB_Tester</RootNamespace>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <AssemblyName>ThreeShapePE_MB_Tester</AssemblyName>
+    <SignAssembly>False</SignAssembly>
+    <Authors>KrzysztofSamordak</Authors>
+    <Company>3Shape Poland Sp. z o.o.</Company>
+    <Description>The PE_MB Tester is a Windows desktop application for testing of USB hub controller and power limiter located on PCBA. The application needs the test hardware and Keysight DC Electronic Load. The program at first step detect the USB hub controller located on PCBA and components connected to it: – on PCBA - network adapter and sound controller placed in tester’s hardware - the USB flash disk. The second step is to control DC Electronic Load and perform load test to verify power limiter functionality.</Description>
+    <Copyright>Copyright 2023 3Shape A/S</Copyright>
+    <RepositoryUrl>https://github.com/Krzysztof-Samordak/PE_MB-Tester.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <ApplicationIcon>PE_MB.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Remove="C:\Users\Krzysztof Samordak\.nuget\packages\ftd2xx.net\1.2.1\contentFiles\any\netstandard2.1\FTDI2XX.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="PE_MB.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Keysight.KtEL30000\3583458-40.ico">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

@@ -35,6 +35,13 @@ namespace PE_MB_Tester.MainViewModel
         //DC electronic load device initialization
         EL _ktEL34143a = new EL();
 
+        //Create Event Watcher
+
+        WqlEventQuery _insertUSBQuery;
+        ManagementEventWatcher _insertUSBWatcher;
+        WqlEventQuery _removeUSBQuery;
+        ManagementEventWatcher _removeUSBWatcher;
+
         //Timer setup
         const int time = 10;
         DispatcherTimer _dispatcherTimer = new DispatcherTimer();
@@ -205,7 +212,17 @@ namespace PE_MB_Tester.MainViewModel
             //check for required devices
             checkRequiredDevices();
 
-            //start WMI USB Devices watcher
+            //Configure WMI USB Devices watcher
+            _insertUSBQuery = new WqlEventQuery("SELECT * FROM __InstanceCreationEvent WITHIN 2 WHERE TargetInstance ISA " +
+                "'Win32_PnPEntity'");
+            _insertUSBWatcher = new ManagementEventWatcher(_insertUSBQuery);
+            _insertUSBWatcher.EventArrived += new EventArrivedEventHandler(DeviceInsertedEvent);
+
+            _removeUSBQuery = new WqlEventQuery("SELECT * FROM __InstanceDeletionEvent WITHIN 2 WHERE TargetInstance ISA " +
+                "'Win32_PnPEntity'");
+            _removeUSBWatcher = new ManagementEventWatcher(_removeUSBQuery);
+            _removeUSBWatcher.EventArrived += new EventArrivedEventHandler(DeviceRemovedEvent);
+            //Start Insert and Remove USB Event Watcher
             StartEventWatcher();
 
             //set the Test Setup to ready
@@ -241,7 +258,10 @@ namespace PE_MB_Tester.MainViewModel
                     ConfigurationManager.AppSettings.Get("ElVisaAdress") is not null &&
                     ConfigurationManager.AppSettings.Get("ElControlAppName") is not null &&
                     ConfigurationManager.AppSettings.Get("ElMinTestLimit") is not null &&
-                    ConfigurationManager.AppSettings.Get("ElMaxTestLimit") is not null))
+                    ConfigurationManager.AppSettings.Get("ElStartCurrent") is not null &&
+                    ConfigurationManager.AppSettings.Get("ElMaxCurrent") is not null &&
+                    ConfigurationManager.AppSettings.Get("ElCurrentIncreasement") is not null &&
+                    ConfigurationManager.AppSettings.Get("ElcheckVoltageAfterTest") is not null))
                 {
                     _penDrive.GetExpextedVid(ConfigurationManager.AppSettings.Get("PenDriveVid"));
                     _penDrive.GetExpextedName(ConfigurationManager.AppSettings.Get("PenDriveName"));
@@ -265,6 +285,10 @@ namespace PE_MB_Tester.MainViewModel
                     _ktEL34143a.setControlAppName(ConfigurationManager.AppSettings.Get("ElControlAppName"));
                     _ktEL34143a.setTestLimits(Convert.ToDouble(ConfigurationManager.AppSettings.Get("ElMinTestLimit")),
                         Convert.ToDouble(ConfigurationManager.AppSettings.Get("ElMaxTestLimit")));
+                    _ktEL34143a.setTestParameters(Convert.ToDouble(ConfigurationManager.AppSettings.Get("ElStartCurrent")),
+                        Convert.ToDouble(ConfigurationManager.AppSettings.Get("ElMaxCurrent")),
+                        Convert.ToDouble(ConfigurationManager.AppSettings.Get("ElCurrentIncreasement")),
+                        bool.Parse(ConfigurationManager.AppSettings.Get("ElCheckVoltageAfterTest")));
                 }
                 else
                 {
@@ -280,19 +304,20 @@ namespace PE_MB_Tester.MainViewModel
 
         void StartEventWatcher()
         {
-            WqlEventQuery insertUSBQuery = new WqlEventQuery("SELECT * FROM __InstanceCreationEvent WITHIN 2 WHERE TargetInstance ISA " +
-                "'Win32_PnPEntity'");
-            ManagementEventWatcher insertUSBWatcher = new ManagementEventWatcher(insertUSBQuery);
-            insertUSBWatcher.EventArrived += new EventArrivedEventHandler(DeviceInsertedEvent);
-            insertUSBWatcher.Start();
+            _insertUSBWatcher.Start();
             _logger.log("Detect of inserted device event started");
 
-            WqlEventQuery removeUSBQuery = new WqlEventQuery("SELECT * FROM __InstanceDeletionEvent WITHIN 2 WHERE TargetInstance ISA " +
-                "'Win32_PnPEntity'");
-            ManagementEventWatcher removeUSBWatcher = new ManagementEventWatcher(removeUSBQuery);
-            removeUSBWatcher.EventArrived += new EventArrivedEventHandler(DeviceRemovedEvent);
-            removeUSBWatcher.Start();
+            _removeUSBWatcher.Start();
             _logger.log("Detect of removed device event started");
+        }
+
+        void StopEventWatcher()
+        {
+            _insertUSBWatcher.Stop();
+            _logger.log("Detect of inserted device event stopped");
+
+            _removeUSBWatcher.Stop();
+            _logger.log("Detect of removed device event stopped");
         }
 
         void DeviceInsertedEvent(object sender, EventArrivedEventArgs e)
@@ -438,6 +463,10 @@ namespace PE_MB_Tester.MainViewModel
             testerStatus = testInprogress;
             testResult = clear;
             _USBTestCompleted = false;
+            tests.Clear();
+            checkRequiredDevices();
+            clearAllUSBLastTestResults();
+            RemoveAllUSBs();
             _logger.log("Test sequence started manually.");
         }
 
@@ -460,27 +489,35 @@ namespace PE_MB_Tester.MainViewModel
         private void DispatcherTimerTick(object sender, EventArgs e)
         {
             TimerStop();
+            StopEventWatcher();
             App.Current.Dispatcher.Invoke(new Action(() => checkUSBTestResults()));
             ThreadPool.QueueUserWorkItem(new WaitCallback(PowerLimiterTest));
         }
 
         private void StartTestClick(object obj)
         {
-            tests.Clear();
-            checkRequiredDevices();
-            clearAllUSBLastTestResults();
-            ThreadPool.QueueUserWorkItem(new WaitCallback(USBTest));
-            ThreadPool.QueueUserWorkItem(new WaitCallback(PowerLimiterTest));
-
+            ManualStartTest();
+            ThreadPool.QueueUserWorkItem(new WaitCallback(TestProcedure));
         }
 
-        private void USBTest(object obj)
+        private void TestProcedure(object obj)
+        {
+            USBTest();
+            if(!_USBTestCompleted)
+            {
+                StopEventWatcher();
+                App.Current.Dispatcher.Invoke(new Action(() => checkUSBTestResults()));
+                PowerLimiterTest(null);
+            }
+            checkIfFinishedAllTests();
+        }
+
+        void USBTest()
         {
             string vidPid = "";
             string name = "";
             string status = "";
 
-            ManualStartTest();
             foreach (ManagementObject device in new ManagementObjectSearcher(String.Format(@"SELECT * FROM Win32_PNPEntity")).Get())
             {
                 vidPid = (string)device.GetPropertyValue("PNPDeviceID");
@@ -488,18 +525,13 @@ namespace PE_MB_Tester.MainViewModel
                 status = (string)device.GetPropertyValue("Status");
                 if (status == "OK")
                 {
-                    if(InsertChekAllIds(vidPid, name))
+                    if (InsertChekAllIds(vidPid, name))
                     {
                         _logger.log(vidPid);
                         _logger.log(name);
                     }
                 }
             }
-            if(!_USBTestCompleted)
-            {
-                App.Current.Dispatcher.Invoke(new Action(() => checkUSBTestResults()));
-            }
-            checkIfFinishedAllTests();
         }
 
         bool checkRequiredDevices()
@@ -546,6 +578,15 @@ namespace PE_MB_Tester.MainViewModel
             _usbCompositeDevice.clearLastTestResult();
             _audioController.clearLastTestResult();
             _networkAdapter.clearLastTestResult();
+        }
+        public void RemoveAllUSBs()
+        {
+            _penDrive.RemoveDevice();
+            _flashDisk.RemoveDevice();
+            _hubController.RemoveDevice();
+            _usbCompositeDevice.RemoveDevice();
+            _audioController.RemoveDevice();
+            _networkAdapter.RemoveDevice();
         }
 
         public void checkUSBTestResults()
@@ -634,6 +675,7 @@ namespace PE_MB_Tester.MainViewModel
                     }
                     getTestResultsAsString();
                     testerStatus = testFinished;
+                    StartEventWatcher();
                 }
             }
         }

@@ -117,5 +117,10 @@ namespace PE_MB_Tester.USBDevices
         {
             lastTestResult = false;
         }
+        public void RemoveDevice()
+        {
+            _vidPid = "";
+            _isInserted = false;
+        }
     }
 }
