@@ -1,6 +1,0 @@
-C:\Users\Krzysztof Samordak\source\repos\PE_MB Tester\PE_MB Tester\obj\Debug\netcoreapp3.0\PE_MB Tester.csproj.AssemblyReference.cache
-C:\Users\Krzysztof Samordak\source\repos\PE_MB Tester\PE_MB Tester\obj\Debug\netcoreapp3.0\View\MainWindow.g.cs
-C:\Users\Krzysztof Samordak\source\repos\PE_MB Tester\PE_MB Tester\obj\Debug\netcoreapp3.0\App.g.cs
-C:\Users\Krzysztof Samordak\source\repos\PE_MB Tester\PE_MB Tester\obj\Debug\netcoreapp3.0\PE_MB Tester_Content.g.cs
-C:\Users\Krzysztof Samordak\source\repos\PE_MB Tester\PE_MB Tester\obj\Debug\netcoreapp3.0\PE_MB Tester_MarkupCompile.cache
-C:\Users\Krzysztof Samordak\source\repos\PE_MB Tester\PE_MB Tester\obj\Debug\netcoreapp3.0\PE_MB Tester_MarkupCompile.lref

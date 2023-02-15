@@ -11,15 +11,26 @@ namespace PE_MB_Tester.ELs
 {
     class EL
     {
+        //Auxiliary variables
         const int _KtELconnected = 111;
         const double divider = 1000;
-        public double measuredValueMinLimit = 0;
-        public double measuredValueMaxLimit = 1.3;
-        string _resourceName = "";
-        string _fileName = "";
         bool _isConnected = false;
         bool _lastTestResult = false;
         double _lastTestResultValue = 0;
+
+        //Name of test file that will be started as proc - set to default
+        string _fileName = "ThreeShapeKtEL30000.exe";
+
+        //DC Electronic Load VISA adress
+        string _resourceName = "";
+
+        //Test configuration variables - set to default
+        public double measuredValueMinLimit = 0;
+        public double measuredValueMaxLimit = 1.3;
+        double _startCurrent = 1.17;
+        double _maxCurrent = 1.24;
+        double _currentIncreasement = 0.001;
+        bool _checkVoltageAfterTest = false;
 
         public bool isConnected()
         {
@@ -78,7 +89,7 @@ namespace PE_MB_Tester.ELs
             string[] returnValue = new string[2];
             returnValue[0] = "Test - FAIL";
             returnValue[1] = "";
-            string arguments = _resourceName + " " + "test";
+            string arguments = _resourceName + " " + "test" + " " + _startCurrent + " " + _maxCurrent + " " + _currentIncreasement + " " + _checkVoltageAfterTest;
             double testResult;
             _lastTestResult = false;
             _lastTestResultValue = 0;
@@ -125,6 +136,14 @@ namespace PE_MB_Tester.ELs
         public bool getTestResult()
         {
             return _lastTestResult;
+        }
+
+        public void setTestParameters(double startCurrent, double maxCurrent, double currentIncreasement, bool checkVoltageAfterTest)
+        {
+            _startCurrent = startCurrent;
+            _maxCurrent = maxCurrent;
+            _currentIncreasement = currentIncreasement;
+            _checkVoltageAfterTest = checkVoltageAfterTest;
         }
     }
 }

@@ -46,7 +46,7 @@ namespace ThreeShape.KtEL30000_connect
 
             //Variables needed for measurement
             string idnResponse;
-            int MeasurementMilisecondsDelay = 200;  //delay between measurements
+            int MeasurementMilisecondsDelay = 300;  //delay between measurements
             int InputTurnOffMilisecondsDelay = 500;  //delay after turning input off
 
             //Crate a message model for communication with DC Electronic Load
@@ -106,7 +106,7 @@ namespace ThreeShape.KtEL30000_connect
                 }
                 catch (NativeVisaException visaException)
                 {
-                    Console.WriteLine("Couldn't connect. Error is:\r\n{0}\r\nPress any key to exit...", visaException);
+                    Console.WriteLine("Couldn't connect. Error is:\r\n{0}\r\n", visaException);
                     return fail;
                 }
 
