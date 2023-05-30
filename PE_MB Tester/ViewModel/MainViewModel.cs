@@ -620,20 +620,29 @@ namespace PE_MB_Tester.MainViewModel
         public void PowerLimiterTest(object obj)
         {
             double result;
+            string resultString = string.Empty;
 
             if (_ktEL34143a.isConnected())
             {
                 _logger.logMultiple(_ktEL34143a.test());
                 result = _ktEL34143a.getTestResultValue();
+                resultString = result.ToString();
+                if(result == _ktEL34143a.maxCurrent)
+                {
+                    resultString = "≥" + result.ToString();
+                }else if (result == _ktEL34143a.startCurrent)
+                {
+                    resultString = "≤" + result.ToString();
+                }
                 if (_ktEL34143a.getTestResult())
                 {
                     App.Current.Dispatcher.Invoke(new Action(() => { tests.Add(new Test() { Id = 04, Name = "Power Limiter Test",
-                        value = Convert.ToString(result), result = pass }); }));
+                        value = resultString, result = pass }); }));
                 }
                 else
                 {
                     App.Current.Dispatcher.Invoke(new Action(() => { tests.Add(new Test() { Id = 04, Name = "Power Limiter Test",
-                        value = Convert.ToString(result), result = fail }); }));
+                        value = resultString, result = fail }); }));
                 }
             }
             checkIfFinishedAllTests();

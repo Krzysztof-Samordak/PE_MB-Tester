@@ -25,8 +25,8 @@ namespace PE_MB_Tester.ELs
         string _resourceName = "";
 
         //Test configuration variables - set to default
-        public double measuredValueMinLimit = 0;
-        public double measuredValueMaxLimit = 1.3;
+        public double measuredValueMinLimit = 1.18;
+        public double measuredValueMaxLimit = 1.24;
         double _startCurrent = 1.17;
         double _maxCurrent = 1.24;
         double _currentIncreasement = 0.001;
@@ -144,6 +144,14 @@ namespace PE_MB_Tester.ELs
             _maxCurrent = maxCurrent;
             _currentIncreasement = currentIncreasement;
             _checkVoltageAfterTest = checkVoltageAfterTest;
+        }
+        public double startCurrent
+        {
+            get { return _startCurrent; }
+        }
+        public double maxCurrent
+        {
+           get { return _maxCurrent; }
         }
     }
 }
